@@ -33,3 +33,6 @@ xcuserdata/
 # Output
 /dist/
 /out/
+
+# Other Workspace Folders
+/Interview couch/
