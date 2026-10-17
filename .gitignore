@@ -1,0 +1,35 @@
+# Gradle
+.gradle/
+build/
+gradle-app.setting
+*.gradle.local
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+.navigation/
+captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+
+# Xcode & iOS Build Artifacts
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+.swiftpm/
+DerivedData/
+*.realm
+*.xcworkspace/
+xcuserdata/
+.DS_Store
+
+# Kotlin Multiplatform / Native Caches
+.kotlin/
+.caches/
+
+# Output
+/dist/
+/out/
