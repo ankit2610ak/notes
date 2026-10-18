@@ -31,6 +31,8 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
+            implementation(libs.androidx.credentials)
+            implementation(libs.androidx.credentials.play.services.auth)
             implementation(libs.androidx.room.runtime)
             implementation(libs.sqlite.bundled)
             implementation(libs.ktor.client.core)
