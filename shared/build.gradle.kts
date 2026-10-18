@@ -30,11 +30,9 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.datetime)
             implementation(libs.androidx.room.runtime)
             implementation(libs.sqlite.bundled)
-            implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(compose.runtime)
@@ -42,14 +40,17 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.components.resources)
         }
+
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.kotlinx.coroutines.test)
+        }
         
         androidMain.dependencies {
             implementation(libs.kotlinx.coroutines.android)
-            implementation(libs.ktor.client.cio)
         }
         
         iosMain.dependencies {
-            implementation(libs.ktor.client.darwin)
         }
     }
 }
@@ -70,9 +71,10 @@ room {
     schemaDirectory("$projectDir/schemas")
 }
 
+tasks.withType<com.google.devtools.ksp.gradle.KspTaskMetadata>().configureEach {
+    enabled = false
+}
+
 dependencies {
-    add("kspAndroid", libs.androidx.room.compiler)
-    add("kspIosArm64", libs.androidx.room.compiler)
-    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
-    add("kspIosX64", libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
 }
