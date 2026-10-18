@@ -1,5 +1,6 @@
 package com.notes.app.presentation.notelist
 
+import com.notes.app.data.local.AppDatabase
 import com.notes.app.data.local.TenantDatabaseManager
 import com.notes.app.data.local.entity.NoteEntity
 import com.notes.app.data.sync.SyncEngine
@@ -32,20 +33,20 @@ class NoteListViewModel(
 
     private fun observeActiveTenant() {
         viewModelScope.launch {
-            tenantDatabaseManager.currentUserId.collectLatest { userId ->
-                if (userId == null) {
+            tenantDatabaseManager.activeDatabase.collectLatest { db ->
+                val userId = tenantDatabaseManager.currentUserId.value
+                if (db == null || userId == null) {
                     _uiState.value = NoteUiState.Success(emptyList())
                 } else {
-                    observeNotes(userId)
+                    observeNotes(db, userId)
                     triggerSync(userId)
                 }
             }
         }
     }
 
-    private fun observeNotes(userId: String) {
+    private fun observeNotes(db: AppDatabase, userId: String) {
         viewModelScope.launch {
-            val db = tenantDatabaseManager.activeDatabase.value ?: return@launch
             db.noteDao().observeNotesByUser(userId).collectLatest { notes ->
                 _uiState.value = NoteUiState.Success(notes = notes)
             }
@@ -68,7 +69,7 @@ class NoteListViewModel(
     @OptIn(ExperimentalUuidApi::class)
     fun createNote(userId: String, title: String, content: String) {
         viewModelScope.launch {
-            val db = tenantDatabaseManager.activeDatabase.value ?: return@launch
+            val db = tenantDatabaseManager.activeDatabase.value ?: tenantDatabaseManager.switchUser(userId)
             val newNote = NoteEntity(
                 id = Uuid.random().toString(),
                 userId = userId,
@@ -85,7 +86,7 @@ class NoteListViewModel(
 
     fun deleteNote(userId: String, noteId: String) {
         viewModelScope.launch {
-            val db = tenantDatabaseManager.activeDatabase.value ?: return@launch
+            val db = tenantDatabaseManager.activeDatabase.value ?: tenantDatabaseManager.switchUser(userId)
             db.noteDao().softDeleteNote(noteId, userId)
             triggerSync(userId)
         }
