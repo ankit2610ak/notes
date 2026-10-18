@@ -31,13 +31,8 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
-            implementation(libs.androidx.credentials)
-            implementation(libs.androidx.credentials.play.services.auth)
             implementation(libs.androidx.room.runtime)
             implementation(libs.sqlite.bundled)
-            implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(compose.runtime)
@@ -49,16 +44,13 @@ kotlin {
         commonTest.dependencies {
             implementation(kotlin("test"))
             implementation(libs.kotlinx.coroutines.test)
-            implementation(libs.ktor.client.mock)
         }
         
         androidMain.dependencies {
             implementation(libs.kotlinx.coroutines.android)
-            implementation(libs.ktor.client.cio)
         }
         
         iosMain.dependencies {
-            implementation(libs.ktor.client.darwin)
         }
     }
 }

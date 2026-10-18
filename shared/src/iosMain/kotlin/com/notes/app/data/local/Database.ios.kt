@@ -1,7 +1,6 @@
 package com.notes.app.data.local
 
 import androidx.room.Room
-import androidx.room.RoomDatabase
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
@@ -10,12 +9,14 @@ import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
-actual fun getDatabaseBuilder(): RoomDatabase.Builder<AppDatabase> {
-    val dbFilePath = documentDirectory() + "/notes.db"
+actual fun getDatabase(): AppDatabase {
+    val dbFilePath = documentDirectory() + "/notes_offline.db"
     return Room.databaseBuilder<AppDatabase>(
         name = dbFilePath
     ).setDriver(BundledSQLiteDriver())
      .setQueryCoroutineContext(Dispatchers.IO)
+     .fallbackToDestructiveMigration(true)
+     .build()
 }
 
 @OptIn(ExperimentalForeignApi::class)
