@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.notes.app.data.local.entity.NoteEntity
@@ -14,6 +15,8 @@ import com.notes.app.presentation.components.AccountSwitcher
 @Composable
 fun NoteListScreen(
     currentUserId: String?,
+    userDisplayName: String? = null,
+    userEmail: String? = null,
     availableUsers: List<String>,
     uiState: NoteUiState,
     onUserSelected: (String) -> Unit,
@@ -23,13 +26,27 @@ fun NoteListScreen(
 ) {
     Scaffold(
         topBar = {
-            Row(modifier = Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("Notes", style = MaterialTheme.typography.headlineMedium)
-                AccountSwitcher(
-                    currentUserId = currentUserId,
-                    availableUsers = availableUsers,
-                    onUserSelected = onUserSelected
-                )
+            Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text("Notes", style = MaterialTheme.typography.headlineMedium)
+                        if (userDisplayName != null) {
+                            Text("Profile: $userDisplayName", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                        }
+                        if (userEmail != null) {
+                            Text(userEmail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary)
+                        }
+                    }
+                    AccountSwitcher(
+                        currentUserId = currentUserId,
+                        availableUsers = availableUsers,
+                        onUserSelected = onUserSelected
+                    )
+                }
             }
         },
         floatingActionButton = {
@@ -43,11 +60,11 @@ fun NoteListScreen(
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
             when (val state = uiState) {
                 is NoteUiState.Loading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(androidx.compose.ui.Alignment.Center))
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
                 is NoteUiState.Success -> {
                     if (state.notes.isEmpty()) {
-                        Text("No notes found.", modifier = Modifier.align(androidx.compose.ui.Alignment.Center))
+                        Text("No notes found. Tap '+' to create one.", modifier = Modifier.align(Alignment.Center))
                     } else {
                         LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
                             items(state.notes, key = { it.id }) { note ->
@@ -70,7 +87,7 @@ fun NoteListScreen(
                     }
                 }
                 is NoteUiState.Error -> {
-                    Text(state.message, color = MaterialTheme.colorScheme.error, modifier = Modifier.align(androidx.compose.ui.Alignment.Center))
+                    Text(state.message, color = MaterialTheme.colorScheme.error, modifier = Modifier.align(Alignment.Center))
                 }
             }
         }
