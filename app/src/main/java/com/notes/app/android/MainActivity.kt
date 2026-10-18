@@ -15,41 +15,46 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 class MainActivity : ComponentActivity() {
 
-    private val httpClient = HttpClient(CIO) {
-        install(ContentNegotiation) {
-            json(Json { ignoreUnknownKeys = true })
-        }
-    }
-
-    private val tenantDatabaseManager by lazy {
-        appContext = applicationContext
-        TenantDatabaseManager { _ ->
-            getDatabaseBuilder()
-        }
-    }
-
-    private val syncEngine by lazy {
-        SyncEngine(
-            noteDao = tenantDatabaseManager.switchUser("default_user").noteDao(),
-            httpClient = httpClient
-        )
-    }
-
-    private val viewModel by lazy {
-        NoteListViewModel(
-            tenantDatabaseManager = tenantDatabaseManager,
-            syncEngine = syncEngine
-        )
-    }
+    private lateinit var tenantDatabaseManager: TenantDatabaseManager
+    private lateinit var syncEngine: SyncEngine
+    private lateinit var viewModel: NoteListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         appContext = applicationContext
+
+        val httpClient = HttpClient(CIO) {
+            install(ContentNegotiation) {
+                json(Json { ignoreUnknownKeys = true })
+            }
+        }
+
+        tenantDatabaseManager = TenantDatabaseManager { _ ->
+            getDatabaseBuilder()
+        }
+
+        val defaultDb = getDatabaseBuilder().build()
+
+        syncEngine = SyncEngine(
+            noteDao = defaultDb.noteDao(),
+            httpClient = httpClient
+        )
+
+        viewModel = NoteListViewModel(
+            tenantDatabaseManager = tenantDatabaseManager,
+            syncEngine = syncEngine
+        )
+
+        CoroutineScope(Dispatchers.Main).launch {
+            tenantDatabaseManager.switchUser("default_user")
+        }
         
         setContent {
             val scope = rememberCoroutineScope()
