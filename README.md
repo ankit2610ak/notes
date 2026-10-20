@@ -1,12 +1,18 @@
 # Notes - Kotlin Multiplatform (KMP) Offline-First App
 
-A cross-platform (Android & iOS) offline-first note-saving application built with modern Kotlin Multiplatform, Compose Multiplatform, and AndroidX Room KMP following Clean Architecture principles.
+A cross-platform (Android & iOS) offline-first note-saving application built with modern Kotlin Multiplatform, Compose Multiplatform, and AndroidX Room KMP.
 
 ## 🚀 Tech Stack
 - **Kotlin Multiplatform (KMP)**: Shared domain, data, and presentation logic.
 - **Compose Multiplatform**: Declarative cross-platform UI adhering to Material 3 guidelines.
 - **AndroidX Room KMP**: Local offline SQLite database with bundled SQLite driver.
 - **Kotlinx Coroutines & Serialization**: Asynchronous execution and data serialization.
+
+---
+
+## 🤖 DevOps & CI/CD
+- **Automated CI/CD Pipeline**: GitHub Actions workflows (`ci.yml`, `cd-android.yml`) verifying multiplatform compilation, executing unit tests, and building release App Bundles (`.aab`).
+- **Branch Protection**: Strict PR and approval rules protecting the `main` branch.
 
 ---
 
@@ -36,7 +42,7 @@ classDiagram
 
     class NoteListViewModel {
         - AppDatabase database
-        - StateFlow<NoteUiState> uiState
+        - StateFlow~NoteUiState~ uiState
         + saveNote(noteId, title, content)
         + deleteNote(noteId)
     }
@@ -48,7 +54,7 @@ classDiagram
 
     class NoteDao {
         <<interface>>
-        + observeNotes() Flow<List<NoteEntity>>
+        + observeNotes() Flow~List~NoteEntity~~
         + upsertNote(note)
         + deleteNote(noteId)
     }
